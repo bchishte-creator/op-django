@@ -1,0 +1,37 @@
+{% extends 'tracker/base.html' %}
+{% load static %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<section class="login-page">
+    <div class="login-heading">
+        <h1>Welcome back</h1>
+        <p>Sign in with the username and password you created.</p>
+    </div>
+    <form class="panel login-card" method="post" action="{% url 'tracker:login' %}" aria-label="Sign in">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ next }}">
+        <div class="login-brand">
+            <img class="login-brand-logo" src="{% static 'tracker/images/our-logo.png' %}" alt="University of New Hampshire Interoperability Labs">
+        </div>
+        {% if form.non_field_errors %}
+            <div class="login-error" role="alert">
+                {% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
+            </div>
+        {% endif %}
+        <label class="field" for="{{ form.username.id_for_label }}">
+            <span>Username</span>
+            {{ form.username }}
+            {% for error in form.username.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+        </label>
+        <label class="field" for="{{ form.password.id_for_label }}">
+            <span>Password</span>
+            {{ form.password }}
+            {% for error in form.password.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+        </label>
+        <button class="button button-primary login-button" type="submit">Sign in</button>
+        <p class="login-footnote">Enter your Django account username, not your email address.</p>
+    </form>
+</section>
+{% endblock %}

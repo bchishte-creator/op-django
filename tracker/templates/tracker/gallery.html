@@ -1,0 +1,28 @@
+{% extends 'tracker/base.html' %}
+
+{% block title %}Food pictures{% endblock %}
+
+{% block content %}
+<section class="page-intro gallery-intro">
+    <div>
+        <span class="eyebrow">A taste of the archive</span>
+        <h1>Food pictures</h1>
+        <p>A visual gallery of meals shared by the team.</p>
+    </div>
+    <span class="category-pill">All photos</span>
+</section>
+
+<section class="gallery-grid" aria-label="Food photo gallery">
+    {% for event in events %}
+        <article class="gallery-card">
+            <div class="gallery-art"><img src="{{ event.photo.url }}" alt="{{ event.food.name }}"></div>
+            <div class="gallery-caption">
+                <h2>{{ event.food.name }}</h2>
+                <span>{{ event.consumed_at|date:"M j" }}</span>
+            </div>
+        </article>
+    {% empty %}
+        <p class="empty-state">No food photos yet. Add one when you <a href="{% url 'tracker:submit' %}">log a food event</a>.</p>
+    {% endfor %}
+</section>
+{% endblock %}

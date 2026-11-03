@@ -1,0 +1,60 @@
+{% extends 'tracker/base.html' %}
+
+{% block title %}Search food events{% endblock %}
+
+{% block content %}
+<section class="page-intro">
+    <span class="eyebrow">Find something delicious</span>
+    <h1>Search food events</h1>
+    <p>Find meals by food, person, category, or date.</p>
+</section>
+
+<section class="panel search-panel">
+    <form class="search-fields" method="get" action="{% url 'tracker:search' %}">
+        <label class="field" for="{{ form.q.id_for_label }}">
+            <span>{{ form.q.label }}</span>
+            {{ form.q }}
+            {% for error in form.q.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+        </label>
+        <label class="field" for="{{ form.category.id_for_label }}">
+            <span>{{ form.category.label }}</span>
+            {{ form.category }}
+            {% for error in form.category.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+        </label>
+        <label class="field" for="{{ form.period.id_for_label }}">
+            <span>{{ form.period.label }}</span>
+            {{ form.period }}
+            {% for error in form.period.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+        </label>
+        <div class="search-actions">
+            <button class="button button-primary search-button" type="submit">Search</button>
+            <a class="text-link" href="{% url 'tracker:search' %}">Clear</a>
+        </div>
+    </form>
+</section>
+
+<section class="results-section">
+    <div class="section-heading results-heading">
+        <h2>{{ result_count }} result{{ result_count|pluralize }}</h2>
+        <span class="sort-label">Newest first</span>
+    </div>
+    <div class="panel event-list">
+        {% for event in events %}
+            <article class="event-row">
+                {% if event.photo %}
+                    <img class="food-icon" src="{{ event.photo.url }}" alt="">
+                {% else %}
+                    <span class="food-icon food-icon-placeholder" aria-hidden="true">{{ event.food.name|first|upper }}</span>
+                {% endif %}
+                <div class="event-detail">
+                    <h3>{{ event.food.name }}</h3>
+                    <p>{{ event.consumer.name }} <span>·</span> {{ event.consumed_at|date:"M j, Y" }}</p>
+                </div>
+                <span class="category-pill">{{ event.category.name }}</span>
+            </article>
+        {% empty %}
+            <p class="empty-state">No matching food events found. Try changing your filters or <a href="{% url 'tracker:submit' %}">log an event</a>.</p>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

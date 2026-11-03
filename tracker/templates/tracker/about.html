@@ -1,0 +1,38 @@
+{% extends 'tracker/base.html' %}
+
+{% block title %}About the tracker{% endblock %}
+
+{% block content %}
+<section class="page-intro">
+    <span class="eyebrow">Made for sharing</span>
+    <h1>About the tracker</h1>
+    <p>A small team project for recording and exploring food events.</p>
+</section>
+
+<section class="about-grid">
+    <article class="panel about-copy">
+        <span class="eyebrow">Why we built it</span>
+        <h2>Good food deserves a place in the team story.</h2>
+        <p>The OST Food Tracker gives the team one place to record what was eaten, who ate it, and when.</p>
+        <p>Search older entries and browse food photos to revisit the meals we have shared.</p>
+    </article>
+    <article class="what-you-can-do">
+        <span class="eyebrow">What you can do</span>
+        <ul>
+            <li><span>01</span>Log a meal</li>
+            <li><span>02</span>Search the archive</li>
+            <li><span>03</span>Browse food photos</li>
+            <li><span>04</span>Keep a team history</li>
+        </ul>
+    </article>
+</section>
+
+<section class="how-it-works">
+    <div class="section-heading"><h2>How it works</h2></div>
+    <div class="steps-grid">
+        <article class="panel step-card"><span class="step-number">1</span><h3>Submit</h3><p>Enter the food event details.</p></article>
+        <article class="panel step-card"><span class="step-number">2</span><h3>Organize</h3><p>Store entries by person and category.</p></article>
+        <article class="panel step-card"><span class="step-number">3</span><h3>Explore</h3><p>Search records and view pictures.</p></article>
+    </div>
+</section>
+{% endblock %}

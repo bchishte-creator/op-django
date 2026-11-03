@@ -1,0 +1,58 @@
+{% extends 'tracker/base.html' %}
+{% load static %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<section class="welcome">
+    <span class="eyebrow">A little more flavor in the team archive</span>
+    <h1>Welcome back, food trackers!</h1>
+    <p>Record team meals, find past entries, and browse the gallery.</p>
+</section>
+
+<section class="stats-grid" aria-label="Food tracker summary">
+    <article class="stat-card">
+        <span class="stat-label">Meals logged</span>
+        <strong>{{ meal_count }}</strong>
+        <span class="stat-note">all time</span>
+    </article>
+    <article class="stat-card">
+        <span class="stat-label">This week</span>
+        <strong>{{ week_count }}</strong>
+        <span class="stat-note">food events shared</span>
+    </article>
+    <article class="stat-card">
+        <span class="stat-label">Top category</span>
+        <strong class="stat-category">{{ top_category }}</strong>
+        <span class="stat-note">most logged</span>
+    </article>
+</section>
+
+<section class="panel event-panel">
+    <div class="section-heading">
+        <div>
+            <span class="eyebrow">Fresh from the team</span>
+            <h2>Recent food events</h2>
+        </div>
+        <a class="text-link" href="{% url 'tracker:search' %}">View all <span aria-hidden="true">→</span></a>
+    </div>
+    <div class="event-list">
+        {% for event in recent_events %}
+            <article class="event-row">
+                {% if event.photo %}
+                    <img class="food-icon" src="{{ event.photo.url }}" alt="">
+                {% else %}
+                    <span class="food-icon food-icon-placeholder" aria-hidden="true">{{ event.food.name|first|upper }}</span>
+                {% endif %}
+                <div class="event-detail">
+                    <h3>{{ event.food.name }}</h3>
+                    <p>{{ event.consumer.name }} <span>·</span> {{ event.consumed_at|date:"M j, g:i A" }}</p>
+                </div>
+                <span class="category-pill">{{ event.category.name }}</span>
+            </article>
+        {% empty %}
+            <p class="empty-state">No food events yet. <a href="{% url 'tracker:submit' %}">Log the first one.</a></p>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

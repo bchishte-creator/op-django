@@ -1,0 +1,59 @@
+{% extends 'tracker/base.html' %}
+
+{% block title %}Submit a food event{% endblock %}
+
+{% block content %}
+<section class="page-intro">
+    <span class="eyebrow">Add to the team archive</span>
+    <h1>Log a food event</h1>
+    <p>Add the details now. Attach a photo if one is available.</p>
+</section>
+
+<section class="panel form-panel">
+    <form class="food-form" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <label class="field" for="{{ form.food_name.id_for_label }}">
+            <span>{{ form.food_name.label }}</span>
+            {{ form.food_name }}
+            {% for error in form.food_name.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+        </label>
+        <label class="field" for="{{ form.consumer.id_for_label }}">
+            <span>{{ form.consumer.label }}</span>
+            {{ form.consumer }}
+            {% for error in form.consumer.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+        </label>
+        <label class="field" for="{{ form.consumed_on.id_for_label }}">
+            <span>{{ form.consumed_on.label }}</span>
+            {{ form.consumed_on }}
+            {% for error in form.consumed_on.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+        </label>
+        <label class="field" for="{{ form.category.id_for_label }}">
+            <span>{{ form.category.label }}</span>
+            {{ form.category }}
+            {% for error in form.category.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+        </label>
+        <label class="field" for="{{ form.consumed_time.id_for_label }}">
+            <span>{{ form.consumed_time.label }}</span>
+            {{ form.consumed_time }}
+            {% for error in form.consumed_time.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+        </label>
+        <label class="field" for="{{ form.photo.id_for_label }}">
+            <span>Food photo <span class="optional-note">(optional, 5 MB max)</span></span>
+            <span class="upload-box">
+                <strong>Choose a food photo</strong>
+                {{ form.photo }}
+            </span>
+            {% for error in form.photo.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+        </label>
+        <label class="field notes-field" for="{{ form.notes.id_for_label }}">
+            <span>{{ form.notes.label }}</span>
+            {{ form.notes }}
+            {% for error in form.notes.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+        </label>
+        <div class="form-action">
+            <button class="button button-primary" type="submit">Save event</button>
+            <span class="form-hint">Your event will appear in the team archive.</span>
+        </div>
+    </form>
+</section>
+{% endblock %}
