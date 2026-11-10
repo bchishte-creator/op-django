@@ -9,7 +9,7 @@ The OST Food Tracker is a Django application for recording team members' food ev
 | Part 1: Application bones | Complete | Django project and app, six page templates, navigation, responsive styling, and local mockup photos. |
 | Part 2: Data model and database | Implemented | Normalized Django models, migrations, database-backed submission and search, photo uploads, and PostgreSQL support. The developer setup described below has been migrated to PostgreSQL and populated from the SQLite fixture. |
 | Part 3: REST API | Implemented | Django REST Framework CRUD endpoints for categories, people, foods, and food events, including search and filters. |
-| Part 4: Containerize | Not started | Add a production WSGI server (for example Gunicorn), Nginx, Dockerfiles and Docker Compose for Django/PostgreSQL/Nginx, and shared static/media volumes. The Compose site should be available on `localhost:8080`. |
+| Part 4: Containerize | Complete locally | Docker Compose runs Django/Gunicorn, PostgreSQL, and Nginx with persistent database/static/media volumes. The app was verified at `http://localhost:8080`, including login, displayed images, and recipe submission. |
 | Part 5: Deploy | Not started | Deploy to an approved UNH/IOL VM, join it to the OS IPA domain, request and configure the HTTP TLS certificate, and serve HTTPS through Nginx with HTTP redirected to HTTPS. This requires access to the organization's infrastructure. |
 
 Part 2's code is implemented and PostgreSQL is supported. The project still defaults to SQLite if PostgreSQL environment variables are not set in the current terminal; see [Database selection](#database-selection). Sharing the ER diagram and API documentation with a manager or team lead is also a project follow-up.
@@ -75,6 +75,7 @@ requirements.txt              Python package dependencies
 
 - Python 3.14 (or a Python version compatible with the installed Django dependencies)
 - PostgreSQL for the Part 2 relational database requirement; SQLite remains available for a quick local start.
+- Docker Engine and Docker Compose for Part 4.
 - For the API, photo uploads, and PostgreSQL support: the packages listed in `requirements.txt`.
 
 ## Run locally
@@ -104,6 +105,43 @@ python manage.py createsuperuser
 ```
 
 The demo-data command creates sample categories, people, food events, and photos. It is safe to run again; existing demo events will not be duplicated.
+
+## Run the containerized app (Part 4)
+
+Docker Compose starts its own PostgreSQL container and database volume. This database is separate from both the SQLite `db.sqlite3` file and any PostgreSQL server installed directly on your computer. The Django container runs migrations on startup; named volumes preserve the container database and uploaded files when containers stop.
+
+Create a local `.env` file from the example. `.env` is ignored by Git; do not commit real passwords or secret keys:
+
+```bash
+cp .env.example .env
+python3 -c "import secrets; print(secrets.token_urlsafe(48))"
+```
+
+Edit `.env` and set a unique, strong value for both `POSTGRES_PASSWORD` and `DJANGO_SECRET_KEY` (you can use the generated value for the secret key). Leave the example empty values out; Compose will refuse to start until both are set.
+
+Start the application from the project directory:
+
+```bash
+docker compose up --build
+```
+
+Open <http://localhost:8080/>. Django Admin is at <http://localhost:8080/admin/>, and the REST API is at <http://localhost:8080/api/>. In another terminal, create demo records or an admin user:
+
+```bash
+docker compose exec web python manage.py seed_demo_data
+docker compose exec web python manage.py createsuperuser
+```
+
+To check the services and logs:
+
+```bash
+docker compose ps
+docker compose logs -f web nginx
+```
+
+Stop the containers with `Ctrl+C`, then run `docker compose down`. The named volumes are kept. To start again use `docker compose up`; do not use `docker compose down -v` unless you deliberately want to permanently delete the container database and uploaded files.
+
+The Nginx port is bound to `127.0.0.1` only, so this Compose setup is for local development and is not publicly reachable by default. It runs with `DEBUG=False`, uses Gunicorn behind Nginx, and serves static and uploaded media files from shared volumes. The training API is still unauthenticated, so do not expose this setup to an untrusted network.
 
 ## Use PostgreSQL
 
@@ -197,10 +235,20 @@ python manage.py migrate
 
 Tests use Django's isolated temporary test database; they do not replace the development database.
 
-## Remaining onboarding work
+## Onboarding hand-off checklist
 
-1. **Part 4 — containerization:** Add Docker Compose services for Django, PostgreSQL, Gunicorn (or another WSGI server), and Nginx. Configure Nginx to serve the site on `localhost:8080` and serve static and uploaded media files from shared volumes.
-2. **Part 5 — deployment:** With the required UNH/IOL infrastructure access, provision a VM on the OS Infrastructure network, join it to OS IPA, create the HTTP service principal, request a certificate with `ipa-getcert`, and configure Nginx to serve HTTPS and redirect HTTP to HTTPS.
-3. **Project hand-off:** Share the ER diagram and API endpoint documentation/demo with the manager or team lead, as required by Parts 2 and 3.
+These are the sharing, review, or presentation items explicitly called out in the onboarding assignment. Checking a box is a coordination task outside the codebase; having the document in this repository does not mean it has been shared.
 
-Parts 4 and 5 are not implemented in this repository yet. The Django development server (`runserver`) is for local development only and is not the production server required for those parts.
+- [ ] **Part 1 — mockups:** Share the page mockups with your manager or a team lead. The current mockup images came from the provided project materials; confirm whether your lead expects a separate presentation of your implemented pages as well.
+- [ ] **Part 2 — data model and backend:** Share the normalized ER diagram in [docs/DATA_MODEL.md](docs/DATA_MODEL.md) with your manager or a team lead, and present the implemented schema and database-backed insertion/search pages.
+- [ ] **Part 3 — REST API:** Share [docs/API.md](docs/API.md) with your manager or a team lead, and walk them through the API endpoints. A quick local demo is available at `/api/` and `/api/events/` when the development server is running.
+- [ ] **Part 3 — API behavior demo:** Demonstrate how API clients can read and create records (and, if useful, update/delete them), as well as search/filter food events.
+
+The onboarding instructions do not specify a separate manager/team-lead hand-off for Parts 4 or 5. Their implementation deliverables are tracked below.
+
+## Remaining implementation work
+
+1. **Part 4 — containerization:** Complete locally. Docker Compose started Django/Gunicorn, PostgreSQL, and Nginx; the user confirmed login, displayed images, and recipe submission work at `localhost:8080`. Review the configuration with your team if required.
+2. **Part 5 — deployment (not started):** With the required UNH/IOL infrastructure access, provision a VM on the OS Infrastructure network, join it to OS IPA, create the HTTP service principal, request a certificate with `ipa-getcert`, and configure Nginx to serve HTTPS and redirect HTTP to HTTPS.
+
+Parts 1–3 are implemented in code. The Part 1–3 sharing/presentation items above still need to be done with your manager or team lead. Part 4's local Compose stack is implemented and working. Part 5 is not implemented. The Django development server (`runserver`) is for local development only and is not the server used by Compose or the eventual production deployment.
